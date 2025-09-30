@@ -8,6 +8,8 @@ sheets:
   - type: "Walnut"
     width: 96
     height: 48
+    cost: 250.00
+    
 
 pieces:
   - type: "Walnut"
