@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Cut List: Living Room Console</title>
+    <title>Cut List: {{ project_name }}</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script defer src="https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js"></script>
     <style>
@@ -17,7 +17,7 @@
 </head>
 <body class="bg-slate-100 font-sans" x-data="cutlistReport()">
     <header class="bg-slate-800 text-white p-6 text-center no-print">
-        <h1 class="text-4xl font-bold">Living Room Console</h1>
+        <h1 class="text-4xl font-bold">{{ project_name }}</h1>
         <p class="text-slate-300">Cut List & Layout Report</p>
     </header>
 
@@ -103,9 +103,9 @@
     <script>
         function cutlistReport() {
             // Data will be injected by Jinja2
-            const layoutData = {"Walnut": [{"height": 48, "pieces": [{"height": 12, "id": "Top_11", "name": "Top", "quantity": 1, "type": "Walnut", "width": 60, "x": 0, "y": 0}, {"height": 12, "id": "Side_7", "name": "Side", "quantity": 4, "type": "Walnut", "width": 30, "x": 60.125, "y": 0}, {"height": 12, "id": "Side_8", "name": "Side", "quantity": 4, "type": "Walnut", "width": 30, "x": 0, "y": 12.125}, {"height": 12, "id": "Side_9", "name": "Side", "quantity": 4, "type": "Walnut", "width": 30, "x": 30.125, "y": 12.125}, {"height": 12, "id": "Side_10", "name": "Side", "quantity": 4, "type": "Walnut", "width": 30, "x": 60.25, "y": 12.125}, {"height": 19, "id": "Shelf_1", "name": "Shelf", "quantity": 6, "type": "Walnut", "width": 12, "x": 0, "y": 24.25}, {"height": 19, "id": "Shelf_2", "name": "Shelf", "quantity": 6, "type": "Walnut", "width": 12, "x": 12.125, "y": 24.25}, {"height": 19, "id": "Shelf_3", "name": "Shelf", "quantity": 6, "type": "Walnut", "width": 12, "x": 24.25, "y": 24.25}, {"height": 19, "id": "Shelf_4", "name": "Shelf", "quantity": 6, "type": "Walnut", "width": 12, "x": 36.375, "y": 24.25}, {"height": 19, "id": "Shelf_5", "name": "Shelf", "quantity": 6, "type": "Walnut", "width": 12, "x": 48.5, "y": 24.25}, {"height": 19, "id": "Shelf_6", "name": "Shelf", "quantity": 6, "type": "Walnut", "width": 12, "x": 60.625, "y": 24.25}, {"height": 12, "id": "Drawer face_12", "name": "Drawer face", "quantity": 3, "type": "Walnut", "width": 7, "x": 72.75, "y": 24.25}, {"height": 12, "id": "Drawer face_13", "name": "Drawer face", "quantity": 3, "type": "Walnut", "width": 7, "x": 79.875, "y": 24.25}, {"height": 12, "id": "Drawer face_14", "name": "Drawer face", "quantity": 3, "type": "Walnut", "width": 7, "x": 87.0, "y": 24.25}], "unplaced": [], "width": 96}]};
-            const summaryData = {"Walnut": 1};
-            const detailsData = {"kerf": 0.125, "rotation_enabled": false, "total_cost": 250.0, "yield_percentage": "82.03%"};
+            const layoutData = {{ layout | tojson }};
+            const summaryData = {{ summary | tojson }};
+            const detailsData = {{ details | tojson }};
 
             // Pre-sort the pieces for consistency
             for (const type in layoutData) {
