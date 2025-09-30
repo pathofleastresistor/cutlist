@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Plywood Optimizer{% endblock %}</title>
+    <script src="https://cdn.tailwindcss.com?plugins=forms"></script>
+    <script src="https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js"></script>
+    <style>
+        /* Global Style Overrides for a Softer Look */
+        .form-input, .form-select, .form-checkbox, .form-radio {
+            border-color: #e2e8f0; /* slate-200 */
+            border-radius: 0.5rem; /* rounded-lg */
+        }
+        .form-input:focus, .form-select:focus, .form-checkbox:focus, .form-radio:focus {
+            --tw-ring-color: #38bdf8; /* sky-400 */
+            border-color: #38bdf8; /* sky-400 */
+        }
+        .form-checkbox:checked {
+            background-color: #0ea5e9; /* sky-500 */
+        }
+
+        /* Print-specific styles */
+        @media print {
+            body { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+            .no-print { display: none !important; }
+            .print-card { box-shadow: none !important; border: 1px solid #ccc !important; }
+            @page { margin: 0.5in; }
+        }
+    </style>
+    {% block scripts %}{% endblock %}
+</head>
+<body class="bg-slate-100 font-sans">
+    <nav class="bg-slate-800 text-white shadow-md no-print">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex items-center justify-between h-16">
+                <div class="flex items-center">
+                    <a href="{{ url_for('index') }}" class="font-bold text-xl">Plywood Optimizer</a>
+                </div>
+                <div class="flex items-center space-x-4">
+                    <a href="{{ url_for('index') }}" class="px-3 py-2 rounded-md text-sm font-medium hover:bg-slate-700">New Project</a>
+                    <a href="{{ url_for('projects') }}" class="px-3 py-2 rounded-md text-sm font-medium hover:bg-slate-700">Saved Projects</a>
+                </div>
+            </div>
+        </div>
+    </nav>
+    <main>
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                {% for category, message in messages %}
+                    <div class="max-w-7xl mx-auto mt-4 px-4 no-print">
+                         <div class="p-4 rounded-lg {{ 'bg-red-100 text-red-700' if category == 'error' else 'bg-green-100 text-green-700' }}">
+                            {{ message }}
+                        </div>
+                    </div>
+                {% endfor %}
+            {% endif %}
+        {% endwith %}
+        {% block content %}{% endblock %}
+    </main>
+    
+</body>
+</html>

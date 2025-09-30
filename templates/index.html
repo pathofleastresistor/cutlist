@@ -1,0 +1,232 @@
+{% extends "_layout.html" %}
+{% block title %}Plywood Optimizer{% endblock %}
+
+{% block content %}
+<div class="max-w-7xl mx-auto p-4 md:p-8" x-data="appController()">
+    <div class="no-print">
+        <form action="{{ url_for('index') }}" method="POST">
+            {% if project %}
+                <input type="hidden" name="project_id" value="{{ project.id }}">
+            {% endif %}
+            
+            <div class="bg-white p-6 rounded-2xl shadow-md mb-8">
+                <h2 class="text-2xl font-bold text-slate-700 border-b border-slate-200 pb-3 mb-4">Project Details</h2>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div>
+                        <label for="project_name" class="block text-sm font-medium text-slate-700">Project Name</label>
+                        <input type="text" name="project_name" id="project_name" x-model="projectName" class="mt-1 block w-full form-input" placeholder="Workshop Cabinet">
+                    </div>
+                    <div>
+                        <label for="saw_kerf" class="block text-sm font-medium text-slate-700">Saw Kerf (inches)</label>
+                        <input type="number" name="saw_kerf" id="saw_kerf" x-model="sawKerf" step="0.001" min="0" required class="mt-1 block w-full form-input" placeholder="0.125">
+                    </div>
+                </div>
+            </div>
+
+            <div class="bg-white p-6 rounded-2xl shadow-md mb-8">
+                <div class="flex justify-between items-center border-b border-slate-200 pb-3 mb-4">
+                    <h2 class="text-2xl font-bold text-slate-700">Sheet Inventory</h2>
+                    <button type="button" @click="addSheet()" class="px-4 py-2 bg-sky-600 text-white text-sm font-medium rounded-lg hover:bg-sky-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-sky-500">Add Sheet</button>
+                </div>
+                <div class="space-y-4">
+                    <template x-for="(sheet, index) in sheets" :key="sheet.clientId">
+                        <div class="grid grid-cols-12 gap-4 items-end">
+                            <div class="col-span-12 md:col-span-4"><label class="block text-xs font-medium text-slate-600">Type</label><input type="text" :name="'sheet_type[]'" x-model="sheet.type" required class="mt-1 w-full form-input"></div>
+                            <div class="col-span-4 md:col-span-2"><label class="block text-xs font-medium text-slate-600">Width</label><input type="number" :name="'sheet_width[]'" x-model="sheet.width" step="any" min="0" required class="mt-1 w-full form-input"></div>
+                            <div class="col-span-4 md:col-span-2"><label class="block text-xs font-medium text-slate-600">Height</label><input type="number" :name="'sheet_height[]'" x-model="sheet.height" step="any" min="0" required class="mt-1 w-full form-input"></div>
+                            <div class="col-span-4 md:col-span-2"><label class="block text-xs font-medium text-slate-600">Cost ($)</label><input type="number" :name="'sheet_cost[]'" x-model="sheet.cost" step="any" min="0" class="mt-1 w-full form-input"></div>
+                            <div class="col-span-12 md:col-span-2 flex justify-end"><button type="button" @click="removeSheet(index)" class="px-3 py-2 bg-red-500 text-white text-sm font-medium rounded-lg hover:bg-red-600 w-full md:w-auto">Remove</button></div>
+                        </div>
+                    </template>
+                </div>
+            </div>
+            
+            <div class="bg-white p-6 rounded-2xl shadow-md mb-8">
+                <div class="flex justify-between items-center border-b border-slate-200 pb-3 mb-4">
+                    <h2 class="text-2xl font-bold text-slate-700">Pieces to Cut</h2>
+                    <button type="button" @click="addPiece()" class="px-4 py-2 bg-sky-600 text-white text-sm font-medium rounded-lg hover:bg-sky-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-sky-500">Add Piece</button>
+                </div>
+                <div class="space-y-4">
+                    <template x-for="(piece, index) in pieces" :key="piece.clientId">
+                        <div class="grid grid-cols-12 gap-4 items-end">
+                            <div class="col-span-6 md:col-span-2"><label class="block text-xs font-medium text-slate-600">Name</label><input type="text" :name="'piece_name[]'" x-model="piece.name" class="mt-1 w-full form-input"></div>
+                            <div class="col-span-6 md:col-span-2"><label class="block text-xs font-medium text-slate-600">Type</label>
+                                <select :name="'piece_type[]'" x-model="piece.type" required class="mt-1 w-full form-select">
+                                    <option value="">Select sheet...</option>
+                                    <template x-for="sheet in sheets"><option :value="sheet.type" :selected="sheet.type === piece.type" x-text="sheet.type"></option></template>
+                                </select>
+                            </div>
+                            <div class="col-span-4 md:col-span-2"><label class="block text-xs font-medium text-slate-600">Width</label><input type="number" :name="'piece_width[]'" x-model="piece.width" step="any" min="0" required class="mt-1 w-full form-input"></div>
+                            <div class="col-span-4 md:col-span-2"><label class="block text-xs font-medium text-slate-600">Height</label><input type="number" :name="'piece_height[]'" x-model="piece.height" step="any" min="0" required class="mt-1 w-full form-input"></div>
+                            <div class="col-span-4 md:col-span-1"><label class="block text-xs font-medium text-slate-600">Qty</label><input type="number" :name="'piece_quantity[]'" x-model="piece.quantity" min="1" required class="mt-1 w-full form-input"></div>
+                            <div class="col-span-6 md:col-span-1 flex items-center justify-center pt-6">
+                                <label class="flex items-center space-x-2 text-xs">
+                                    <input type="checkbox" name="piece_rotation[]" :value="index" x-model="piece.rotation" class="form-checkbox">
+                                    <span>Rotate?</span>
+                                </label>
+                            </div>
+                            <div class="col-span-6 md:col-span-2 flex justify-end"><button type="button" @click="removePiece(index)" class="px-3 py-2 bg-red-500 text-white text-sm font-medium rounded-lg hover:bg-red-600 w-full md:w-auto">Remove</button></div>
+                        </div>
+                    </template>
+                </div>
+            </div>
+
+            <button type="submit" class="w-full py-3 px-4 bg-green-600 text-white font-semibold rounded-lg shadow-md hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-400 focus:ring-opacity-75">Generate Optimized Layout</button>
+        </form>
+    </div>
+
+    {% if results %}
+    <div class="mt-12">
+        <div class="flex justify-between items-center my-6 no-print">
+            <h2 class="text-3xl font-bold text-slate-800">Optimization Results</h2>
+            <form action="{{ url_for('save_project_route') }}" method="POST">
+                {% if project %}
+                    <input type="hidden" name="project_id" value="{{ project.id }}">
+                {% endif %}
+                <input type="hidden" name="project_name" x-model="projectName">
+                <input type="hidden" name="input_data" :value="JSON.stringify({project_name: projectName, saw_kerf: sawKerf, sheets: sheets, pieces: pieces})">
+                <input type="hidden" name="result_data" value='{{ results|tojson|safe if results else '{}' }}'>
+                <button type="submit" class="px-4 py-2 bg-indigo-600 text-white font-medium rounded-lg hover:bg-indigo-700">
+                    <span x-text="projectId ? 'Update Project' : 'Save Project'"></span>
+                </button>
+            </form>
+        </div>
+        
+        <template x-for="([type, sheets]) in Object.entries(layout)">
+            <div>
+                <h2 class="text-3xl font-bold text-slate-800 mb-6" x-text="'Material: ' + type"></h2>
+                <template x-for="(sheet, index) in sheets">
+                    <div class="bg-white rounded-2xl shadow-lg mb-8 overflow-hidden print-card">
+                        <div class="p-6">
+                            <h3 class="text-xl font-bold text-slate-600 mb-4" x-text="'Sheet ' + (index + 1) + ' of ' + sheets.length"></h3>
+                            <div class="relative w-full bg-slate-200 border border-slate-300 mb-6 rounded-lg" :style="`aspect-ratio: ${sheet.width} / ${sheet.height}`">
+                                <template x-for="piece in sheet.pieces">
+                                    <div class="absolute box-border flex items-center justify-center overflow-hidden transition-all duration-150 rounded"
+                                        :style="`left: ${(piece.x / sheet.width * 100)}%; bottom: ${(piece.y / sheet.height * 100)}%; width: ${(piece.width / sheet.width * 100)}%; height: ${(piece.height / sheet.height * 100)}%; background-color: pieceColor(piece.id); border: 1px solid rgba(0,0,0,0.3);`"
+                                        :class="highlightedPiece === piece.id ? 'ring-4 ring-offset-2 ring-sky-500 z-10' : ''">
+                                        <div class="text-[8px] md:text-[10px] font-bold text-center p-1 break-words"
+                                             :style="`color: getContrastColor(pieceColor(piece.id))`"
+                                             x-text="piece.id + ' (' + piece.width + '&quot;x' + piece.height + '&quot;)'"></div>
+                                    </div>
+                                </template>
+                            </div>
+                            <div class="mb-6" x-show="sheet.cut_sequence && sheet.cut_sequence.length > 0">
+                                <h4 class="text-lg font-bold text-slate-600 mb-2">Suggested Cut Sequence</h4>
+                                <ol class="list-decimal list-inside space-y-1 text-slate-700 bg-slate-50 p-4 rounded-lg border border-slate-200">
+                                    <template x-for="cut in sheet.cut_sequence">
+                                        <li x-text="cut"></li>
+                                    </template>
+                                </ol>
+                            </div>
+                            <div class="overflow-x-auto">
+                                <table class="w-full text-sm text-left text-slate-500">
+                                    <thead class="text-xs text-slate-700 uppercase bg-slate-50">
+                                        <tr><th class="px-4 py-3">Piece</th><th class="px-4 py-3">Dimensions</th><th class="px-4 py-3">Position</th></tr>
+                                    </thead>
+                                    <tbody>
+                                        <template x-for="piece in sheet.pieces">
+                                            <tr class="border-b border-slate-200 hover:bg-slate-50" @mouseenter="highlightedPiece = piece.id" @mouseleave="highlightedPiece = null">
+                                                <td class="px-4 py-2 font-medium text-slate-900" x-text="piece.id"></td>
+                                                <td class="px-4 py-2" x-text="piece.width + '&quot; x ' + piece.height + '&quot;'"></td>
+                                                <td class="px-4 py-2" x-text="piece.x.toFixed(3) + ', ' + piece.y.toFixed(3)"></td>
+                                            </tr>
+                                        </template>
+                                        <template x-if="sheet.unplaced && sheet.unplaced.length > 0">
+                                            <tr><td colspan="3" class="px-4 py-2 text-orange-600 font-semibold bg-orange-50">Unplaced Pieces:</td></tr>
+                                            <template x-for="unplacedPiece in sheet.unplaced">
+                                                <tr class="border-b bg-orange-50 border-orange-200"><td class="px-4 py-2" x-text="unplacedPiece.id"></td><td class="px-4 py-2" x-text="unplacedPiece.width + '&quot; x ' + unplacedPiece.height + '&quot;'"></td><td class="px-4 py-2 text-xs">N/A</td></tr>
+                                            </template>
+                                        </template>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </template>
+            </div>
+        </template>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    function appController() {
+        const initialInputs = {{ inputs|tojson|safe if inputs else 'null' }};
+        const resultsData = {{ results|tojson|safe if results else 'null' }};
+        const projectData = {{ project|tojson|safe if project else 'null' }};
+
+        return {
+            projectName: '',
+            sawKerf: 0.125,
+            sheets: [],
+            pieces: [],
+            projectId: null,
+            layout: resultsData,
+            highlightedPiece: null,
+            
+            addSheet() { this.sheets.push({ clientId: Date.now(), type: '', width: 96, height: 48, cost: 0 }); },
+            removeSheet(index) { this.sheets.splice(index, 1); },
+            addPiece() { this.pieces.push({ clientId: Date.now(), name: '', type: this.sheets[0]?.type || '', width: 0, height: 0, quantity: 1, rotation: false }); },
+            removePiece(index) { this.pieces.splice(index, 1); },
+            
+            loadProject(inputs) {
+                this.projectName = inputs.project_name || 'New Project';
+                this.sawKerf = inputs.saw_kerf || 0.125;
+                inputs.sheets.forEach(s => s.clientId = s.clientId || Date.now() + Math.random());
+                inputs.pieces.forEach(p => p.clientId = p.clientId || Date.now() + Math.random());
+                this.sheets = [];
+                this.pieces = [];
+                requestAnimationFrame(() => {
+                    this.sheets = inputs.sheets;
+                    requestAnimationFrame(() => {
+                        this.pieces = inputs.pieces;
+                    });
+                });
+            },
+
+            _pieceColors: {},
+            _colorPalette: ['#a1b4cc', '#c0d6e6', '#e0b3b3', '#d4c7b8', '#b3cbe0', '#e0d8b3', '#a1e0c7', '#c7a1e0'],
+            _colorIndex: 0,
+            pieceColor(id) {
+                if (!this._pieceColors[id]) { this._pieceColors[id] = this._colorPalette[this._colorIndex++ % this._colorPalette.length]; }
+                return this._pieceColors[id];
+            },
+            getContrastColor(hexcolor) {
+                if (!hexcolor || hexcolor.length < 7) return 'white';
+                const r = parseInt(hexcolor.substring(1, 3), 16);
+                const g = parseInt(hexcolor.substring(3, 5), 16);
+                const b = parseInt(hexcolor.substring(5, 7), 16);
+                const luminance = (0.2126 * r + 0.7152 * g + 0.0722 * b) / 255;
+                return luminance > 0.5 ? '#212529' : 'white';
+            },
+
+            init() {
+                if (projectData) { this.projectId = projectData.id; }
+                if (initialInputs) {
+                    this.loadProject(initialInputs);
+                } else {
+                    this.addSheet();
+                    this.sheets[0].type = '3/4 inch Plywood';
+                    this.sheets[0].cost = 85.00;
+                    this.addPiece();
+                    this.pieces[0].name = 'Shelf';
+                    this.pieces[0].type = '3/4 inch Plywood';
+                    this.pieces[0].width = 24;
+                    this.pieces[0].height = 12;
+                }
+                if (this.layout) {
+                    for (const type in this.layout) {
+                        this.layout[type].forEach(sheet => {
+                            if (sheet.pieces) {
+                                sheet.pieces.sort((a, b) => a.id.localeCompare(b.id));
+                            }
+                        });
+                    }
+                }
+            }
+        }
+    }
+</script>
+{% endblock %}

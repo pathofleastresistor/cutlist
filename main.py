@@ -4,7 +4,7 @@ import sys
 import argparse
 import pathlib
 import yaml
-from plywood_optimizer import create_cut_list
+from optimizer import create_cut_list
 from output_generator import generate_html_output
 
 def validate_data(project_data):
