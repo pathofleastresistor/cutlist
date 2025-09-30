@@ -47,8 +47,7 @@
                     </li>
                     <li class="flex items-center text-slate-600" x-show="details.total_cost > 0">
                         <span class="w-28 inline-block">Est. Material Cost:</span>
-                        <strong x-text="'$' + details.total_cost.toFixed(2)"></strong>
-                    </li>
+                        <strong x-text="'$' + details.total_cost.toFixed(3)"></strong> </li>
                 </ul>
             </div>
         </div>
@@ -71,6 +70,14 @@
                                     </div>
                                 </template>
                             </div>
+                            <div class="mb-6" x-show="sheet.cut_sequence && sheet.cut_sequence.length > 0">
+                                <h4 class="text-lg font-bold text-slate-600 mb-2">Suggested Cut Sequence</h4>
+                                <ol class="list-decimal list-inside space-y-1 text-slate-700 bg-slate-50 p-4 rounded-md border">
+                                    <template x-for="cut in sheet.cut_sequence">
+                                        <li x-text="cut"></li>
+                                    </template>
+                                </ol>
+                            </div>
                             <div class="overflow-x-auto">
                                 <table class="w-full text-sm text-left text-slate-500">
                                     <thead class="text-xs text-slate-700 uppercase bg-slate-50">
@@ -81,8 +88,7 @@
                                             <tr class="border-b hover:bg-slate-50" @mouseenter="highlightedPiece = piece.id" @mouseleave="highlightedPiece = null">
                                                 <td class="px-4 py-2 font-medium text-slate-900" x-text="piece.id"></td>
                                                 <td class="px-4 py-2" x-text="piece.width + '&quot; x ' + piece.height + '&quot;'"></td>
-                                                <td class="px-4 py-2" x-text="piece.x.toFixed(2) + ', ' + piece.y.toFixed(2)"></td>
-                                            </tr>
+                                                <td class="px-4 py-2" x-text="piece.x.toFixed(3) + ', ' + piece.y.toFixed(3)"></td> </tr>
                                         </template>
                                         <template x-if="sheet.unplaced && sheet.unplaced.length > 0">
                                             <tr><td colspan="3" class="px-4 py-2 text-orange-600 font-semibold bg-orange-50">Unplaced Pieces:</td></tr>
@@ -102,12 +108,10 @@
     
     <script>
         function cutlistReport() {
-            // Data will be injected by Jinja2
+            // (This script block is unchanged)
             const layoutData = {{ layout | tojson }};
             const summaryData = {{ summary | tojson }};
             const detailsData = {{ details | tojson }};
-
-            // Pre-sort the pieces for consistency
             for (const type in layoutData) {
                 if (layoutData.hasOwnProperty(type)) {
                     layoutData[type].forEach(sheet => {
@@ -117,7 +121,6 @@
                     });
                 }
             }
-
             return {
                 layout: layoutData,
                 summary: summaryData,

@@ -47,8 +47,7 @@
                     </li>
                     <li class="flex items-center text-slate-600" x-show="details.total_cost > 0">
                         <span class="w-28 inline-block">Est. Material Cost:</span>
-                        <strong x-text="'$' + details.total_cost.toFixed(2)"></strong>
-                    </li>
+                        <strong x-text="'$' + details.total_cost.toFixed(3)"></strong> </li>
                 </ul>
             </div>
         </div>
@@ -71,6 +70,14 @@
                                     </div>
                                 </template>
                             </div>
+                            <div class="mb-6" x-show="sheet.cut_sequence && sheet.cut_sequence.length > 0">
+                                <h4 class="text-lg font-bold text-slate-600 mb-2">Suggested Cut Sequence</h4>
+                                <ol class="list-decimal list-inside space-y-1 text-slate-700 bg-slate-50 p-4 rounded-md border">
+                                    <template x-for="cut in sheet.cut_sequence">
+                                        <li x-text="cut"></li>
+                                    </template>
+                                </ol>
+                            </div>
                             <div class="overflow-x-auto">
                                 <table class="w-full text-sm text-left text-slate-500">
                                     <thead class="text-xs text-slate-700 uppercase bg-slate-50">
@@ -81,8 +88,7 @@
                                             <tr class="border-b hover:bg-slate-50" @mouseenter="highlightedPiece = piece.id" @mouseleave="highlightedPiece = null">
                                                 <td class="px-4 py-2 font-medium text-slate-900" x-text="piece.id"></td>
                                                 <td class="px-4 py-2" x-text="piece.width + '&quot; x ' + piece.height + '&quot;'"></td>
-                                                <td class="px-4 py-2" x-text="piece.x.toFixed(2) + ', ' + piece.y.toFixed(2)"></td>
-                                            </tr>
+                                                <td class="px-4 py-2" x-text="piece.x.toFixed(3) + ', ' + piece.y.toFixed(3)"></td> </tr>
                                         </template>
                                         <template x-if="sheet.unplaced && sheet.unplaced.length > 0">
                                             <tr><td colspan="3" class="px-4 py-2 text-orange-600 font-semibold bg-orange-50">Unplaced Pieces:</td></tr>
@@ -102,12 +108,10 @@
     
     <script>
         function cutlistReport() {
-            // Data will be injected by Jinja2
-            const layoutData = {"Walnut": [{"height": 48, "pieces": [{"height": 12, "id": "Top_11", "name": "Top", "quantity": 1, "type": "Walnut", "width": 60, "x": 0, "y": 0}, {"height": 12, "id": "Side_7", "name": "Side", "quantity": 4, "type": "Walnut", "width": 30, "x": 60.125, "y": 0}, {"height": 12, "id": "Side_8", "name": "Side", "quantity": 4, "type": "Walnut", "width": 30, "x": 0, "y": 12.125}, {"height": 12, "id": "Side_9", "name": "Side", "quantity": 4, "type": "Walnut", "width": 30, "x": 30.125, "y": 12.125}, {"height": 12, "id": "Side_10", "name": "Side", "quantity": 4, "type": "Walnut", "width": 30, "x": 60.25, "y": 12.125}, {"height": 19, "id": "Shelf_1", "name": "Shelf", "quantity": 6, "type": "Walnut", "width": 12, "x": 0, "y": 24.25}, {"height": 19, "id": "Shelf_2", "name": "Shelf", "quantity": 6, "type": "Walnut", "width": 12, "x": 12.125, "y": 24.25}, {"height": 19, "id": "Shelf_3", "name": "Shelf", "quantity": 6, "type": "Walnut", "width": 12, "x": 24.25, "y": 24.25}, {"height": 19, "id": "Shelf_4", "name": "Shelf", "quantity": 6, "type": "Walnut", "width": 12, "x": 36.375, "y": 24.25}, {"height": 19, "id": "Shelf_5", "name": "Shelf", "quantity": 6, "type": "Walnut", "width": 12, "x": 48.5, "y": 24.25}, {"height": 19, "id": "Shelf_6", "name": "Shelf", "quantity": 6, "type": "Walnut", "width": 12, "x": 60.625, "y": 24.25}, {"height": 12, "id": "Drawer face_12", "name": "Drawer face", "quantity": 3, "type": "Walnut", "width": 7, "x": 72.75, "y": 24.25}, {"height": 12, "id": "Drawer face_13", "name": "Drawer face", "quantity": 3, "type": "Walnut", "width": 7, "x": 79.875, "y": 24.25}, {"height": 12, "id": "Drawer face_14", "name": "Drawer face", "quantity": 3, "type": "Walnut", "width": 7, "x": 87.0, "y": 24.25}], "unplaced": [], "width": 96}]};
+            // (This script block is unchanged)
+            const layoutData = {"Walnut": [{"cut_sequence": ["Rip cut at 12.000\" from the bottom edge.", "Cross cut at 60.000\" from the left edge.", "Rip cut at 24.125\" from the bottom edge.", "Cross cut at 30.000\" from the left edge.", "Cross cut at 60.125\" from the left edge.", "Rip cut at 43.250\" from the bottom edge.", "Cross cut at 12.000\" from the left edge.", "Cross cut at 24.125\" from the left edge.", "Cross cut at 36.250\" from the left edge.", "Cross cut at 48.375\" from the left edge.", "Cross cut at 60.500\" from the left edge.", "Cross cut at 72.625\" from the left edge.", "Rip cut at 36.250\" from the bottom edge.", "Cross cut at 79.750\" from the left edge.", "Cross cut at 86.875\" from the left edge."], "height": 48, "pieces": [{"height": 12, "id": "Top_11", "name": "Top", "quantity": 1, "type": "Walnut", "width": 60, "x": 0, "y": 0}, {"height": 12, "id": "Side_7", "name": "Side", "quantity": 4, "type": "Walnut", "width": 30, "x": 60.125, "y": 0}, {"height": 12, "id": "Side_8", "name": "Side", "quantity": 4, "type": "Walnut", "width": 30, "x": 0, "y": 12.125}, {"height": 12, "id": "Side_9", "name": "Side", "quantity": 4, "type": "Walnut", "width": 30, "x": 30.125, "y": 12.125}, {"height": 12, "id": "Side_10", "name": "Side", "quantity": 4, "type": "Walnut", "width": 30, "x": 60.25, "y": 12.125}, {"height": 19, "id": "Shelf_1", "name": "Shelf", "quantity": 6, "type": "Walnut", "width": 12, "x": 0, "y": 24.25}, {"height": 19, "id": "Shelf_2", "name": "Shelf", "quantity": 6, "type": "Walnut", "width": 12, "x": 12.125, "y": 24.25}, {"height": 19, "id": "Shelf_3", "name": "Shelf", "quantity": 6, "type": "Walnut", "width": 12, "x": 24.25, "y": 24.25}, {"height": 19, "id": "Shelf_4", "name": "Shelf", "quantity": 6, "type": "Walnut", "width": 12, "x": 36.375, "y": 24.25}, {"height": 19, "id": "Shelf_5", "name": "Shelf", "quantity": 6, "type": "Walnut", "width": 12, "x": 48.5, "y": 24.25}, {"height": 19, "id": "Shelf_6", "name": "Shelf", "quantity": 6, "type": "Walnut", "width": 12, "x": 60.625, "y": 24.25}, {"height": 12, "id": "Drawer face_12", "name": "Drawer face", "quantity": 3, "type": "Walnut", "width": 7, "x": 72.75, "y": 24.25}, {"height": 12, "id": "Drawer face_13", "name": "Drawer face", "quantity": 3, "type": "Walnut", "width": 7, "x": 79.875, "y": 24.25}, {"height": 12, "id": "Drawer face_14", "name": "Drawer face", "quantity": 3, "type": "Walnut", "width": 7, "x": 87.0, "y": 24.25}], "unplaced": [], "width": 96}]};
             const summaryData = {"Walnut": 1};
-            const detailsData = {"kerf": 0.125, "rotation_enabled": false, "total_cost": 250.0, "yield_percentage": "82.03%"};
-
-            // Pre-sort the pieces for consistency
+            const detailsData = {"kerf": 0.125, "rotation_enabled": false, "total_cost": 250.0, "yield_percentage": "82.031%"};
             for (const type in layoutData) {
                 if (layoutData.hasOwnProperty(type)) {
                     layoutData[type].forEach(sheet => {
@@ -117,7 +121,6 @@
                     });
                 }
             }
-
             return {
                 layout: layoutData,
                 summary: summaryData,
