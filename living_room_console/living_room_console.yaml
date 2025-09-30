@@ -1,0 +1,35 @@
+# A descriptive name for your project
+project_name: "Living Room Console"
+
+# The width of your saw blade in inches
+saw_kerf: 0.125
+
+sheets:
+  - type: "Walnut"
+    width: 96
+    height: 48
+
+pieces:
+  - type: "Walnut"
+    name: "Shelf"
+    width: 12
+    height: 19
+    quantity: 6
+    
+  - type: "Walnut"
+    name: "Side"
+    width: 30
+    height: 12
+    quantity: 4
+    
+  - type: "Walnut"
+    name: "Top"
+    width: 60
+    height: 12
+    quantity: 1
+    
+  - type: "Walnut"
+    name: "Drawer face"
+    width: 7
+    height: 12
+    quantity: 3
