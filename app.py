@@ -71,6 +71,7 @@ def view_project(project_id):
     project_obj = get_project(project_id)
     if project_obj:
         inputs = json.loads(project_obj.input_data)
+        results=json.loads(project_obj.result_data)
         
         # THIS IS THE FIX: Create a simple dictionary instead of passing the whole object
         project_data_for_template = {
@@ -78,7 +79,7 @@ def view_project(project_id):
             "name": project_obj.name
         }
         
-        return render_template('index.html', inputs=inputs, results=None, project=project_data_for_template)
+        return render_template('index.html', inputs=inputs, results=results, project=project_data_for_template)
     
     flash('Project not found.', 'error')
     return redirect(url_for('projects'))
